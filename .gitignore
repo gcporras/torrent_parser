@@ -1,0 +1,35 @@
+# swap
+*~
+*.swp
+*.swo
+
+# emacs
+\#*
+.\#*
+
+# Windows
+.DS_Store
+
+# sublimetext2
+*.sublime-*
+
+# Python :: Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+# Python :: Distribution / packaging
+build/
+*.egg-info/
+*.egg
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+htmlcov
+
+*.log
+*.pid
+
+# Pycharm stuff
+.idea
+atlassian-ide-plugin.xml
