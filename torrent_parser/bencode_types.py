@@ -84,3 +84,14 @@ def decode_integer(binteger):
     """
     if bencode_integer_is_valid(binteger):
         return int(binteger[1:binteger.index("e")])
+
+
+def decode_string(bstring):
+    """
+    Decodes the bencoded string representation and returns the string.
+    """
+    if bencode_string_is_valid(bstring):
+        colon = bstring.index(":")
+        length = int(bstring[0:colon])
+        colon += 1
+        return bstring[colon:colon+length]

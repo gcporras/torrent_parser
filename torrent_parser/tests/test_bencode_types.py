@@ -7,6 +7,7 @@ from torrent_parser.bencode_types import (
     bencode_integer_is_valid,
     bencode_string_is_valid,
     decode_integer,
+    decode_string,
     get_bencode_type
 )
 
@@ -50,16 +51,6 @@ class TestBencodeIntegerValidation:
         assert errors.ERROR_BENCODE_INTEGER_LEADING_ZEROS in str(excinfo.value)
 
 
-class TestDecodeBencodeData:
-    @pytest.mark.parametrize("input,expected", [
-        ("i34e", 34),
-        ("i345567745e", 345567745),
-        ("i-4523e", -4523),
-    ])
-    def test_bencode_decode_integer(self, input, expected):
-        assert decode_integer(input) == expected
-
-
 class TestBencodedStringValidation:
     @pytest.mark.parametrize("input,expected", [
         ("4:spam", True),
@@ -78,3 +69,20 @@ class TestBencodedStringValidation:
         with pytest.raises(BencodeTypeError) as excinfo:
             bencode_string_is_valid("4e:toto")
         assert errors.ERROR_BENCODE_STRING_INVALID_LENGTH in str(excinfo.value)
+
+
+class TestDecodeBencodeData:
+    @pytest.mark.parametrize("input,expected", [
+        ("i34e", 34),
+        ("i345567745e", 345567745),
+        ("i-4523e", -4523),
+    ])
+    def test_bencode_decode_integer(self, input, expected):
+        assert decode_integer(input) == expected
+
+    @pytest.mark.parametrize("input,expected", [
+        ("4:spam", "spam"),
+        ("0:", ""),
+    ])
+    def test_bencode_decode_string(self, input, expected):
+        assert decode_string(input) == expected
