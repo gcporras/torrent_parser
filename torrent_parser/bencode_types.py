@@ -59,6 +59,25 @@ def bencode_integer_is_valid(binteger):
     return True
 
 
+def bencode_string_is_valid(bstring):
+    """
+    Validate a bencoded string:
+    A byte string (a sequence of bytes, not necessarily characters) is encoded as <length>:<contents>. The length is
+    encoded in base 10, like integers, but must be non-negative (zero is allowed); the contents are just the bytes
+    that make up the string. The string "spam" would be encoded as 4:spam.
+    """
+    try:
+        colon = bstring.index(":")
+    except ValueError:
+        raise BencodeTypeError(errors.ERROR_BENCODE_STRING_MISSING_COLON, bstring)
+
+    # String length must be a positive integer
+    if not bstring[0:colon].isdigit():
+        raise BencodeTypeError(errors.ERROR_BENCODE_STRING_INVALID_LENGTH, bstring)
+
+    return True
+
+
 def decode_integer(binteger):
     """
     Decodes the bencoded integer representation and returns the integer.

@@ -4,9 +4,10 @@ import pytest
 from torrent_parser import errors
 from torrent_parser.bencode_types import (
     BencodeTypeError,
-    get_bencode_type,
     bencode_integer_is_valid,
-    decode_integer
+    bencode_string_is_valid,
+    decode_integer,
+    get_bencode_type
 )
 
 
@@ -57,3 +58,23 @@ class TestDecodeBencodeData:
     ])
     def test_bencode_decode_integer(self, input, expected):
         assert decode_integer(input) == expected
+
+
+class TestBencodedStringValidation:
+    @pytest.mark.parametrize("input,expected", [
+        ("4:spam", True),
+        ("0:", True),
+        ("35:udp://tracker.openbittorrent.com:8013", True),
+    ])
+    def test_bencode_string_valid_values(self, input, expected):
+        assert bencode_string_is_valid(input) == expected
+
+    def test_bencode_string_invalid_no_colon(self):
+        with pytest.raises(BencodeTypeError) as excinfo:
+            bencode_string_is_valid("4spam")
+        assert errors.ERROR_BENCODE_STRING_MISSING_COLON in str(excinfo.value)
+
+    def test_bencode_string_invalid_no_digit_before_colon(self):
+        with pytest.raises(BencodeTypeError) as excinfo:
+            bencode_string_is_valid("4e:toto")
+        assert errors.ERROR_BENCODE_STRING_INVALID_LENGTH in str(excinfo.value)
