@@ -22,9 +22,9 @@ build/
 *.egg
 
 # Unit test / coverage reports
+.cache
 .coverage
 .tox
-nosetests.xml
 htmlcov
 
 *.log
