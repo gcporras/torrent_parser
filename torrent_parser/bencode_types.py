@@ -57,3 +57,11 @@ def bencode_integer_is_valid(binteger):
             raise BencodeTypeError(errors.ERROR_BENCODE_INTEGER_LEADING_ZEROS, binteger)
 
     return True
+
+
+def decode_integer(binteger):
+    """
+    Decodes the bencoded integer representation and returns the integer.
+    """
+    if bencode_integer_is_valid(binteger):
+        return int(binteger[1:binteger.index("e")])

@@ -5,7 +5,8 @@ from torrent_parser import errors
 from torrent_parser.bencode_types import (
     BencodeTypeError,
     get_bencode_type,
-    bencode_integer_is_valid
+    bencode_integer_is_valid,
+    decode_integer
 )
 
 
@@ -46,3 +47,13 @@ class TestBencodeIntegerValidation:
         with pytest.raises(BencodeTypeError) as excinfo:
             bencode_integer_is_valid("i024e")
         assert errors.ERROR_BENCODE_INTEGER_LEADING_ZEROS in str(excinfo.value)
+
+
+class TestDecodeBencodeData:
+    @pytest.mark.parametrize("input,expected", [
+        ("i34e", 34),
+        ("i345567745e", 345567745),
+        ("i-4523e", -4523),
+    ])
+    def test_bencode_decode_integer(self, input, expected):
+        assert decode_integer(input) == expected
