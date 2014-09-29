@@ -95,3 +95,11 @@ def decode_string(bstring):
         length = int(bstring[0:colon])
         colon += 1
         return bstring[colon:colon+length]
+
+
+def decode_list(blist):
+    """
+    Decodes the bencoded list representation and returns the decoded list.
+    """
+    if blist == "le":
+        return []

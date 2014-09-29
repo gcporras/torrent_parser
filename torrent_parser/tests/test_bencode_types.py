@@ -8,6 +8,7 @@ from torrent_parser.bencode_types import (
     bencode_string_is_valid,
     decode_integer,
     decode_string,
+    decode_list,
     get_bencode_type
 )
 
@@ -86,3 +87,11 @@ class TestDecodeBencodeBasicDataTypes:
     ])
     def test_bencode_decode_string(self, input, expected):
         assert decode_string(input) == expected
+
+
+class TestDecodeBencodeLists:
+    @pytest.mark.parametrize("input,expected", [
+        ("le", []),
+    ])
+    def test_bencode_decode_list(self, input, expected):
+        assert decode_list(input) == expected
