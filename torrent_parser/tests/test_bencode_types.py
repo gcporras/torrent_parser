@@ -9,7 +9,8 @@ from torrent_parser.bencode_types import (
     decode_integer,
     decode_string,
     decode_list,
-    get_bencode_type
+    get_bencode_type,
+    get_item
 )
 
 
@@ -87,6 +88,18 @@ class TestDecodeBencodeBasicDataTypes:
     ])
     def test_bencode_decode_string(self, input, expected):
         assert decode_string(input) == expected
+
+
+class TestGetItems:
+    @pytest.mark.parametrize("input,expected", [
+        ("i34e", ["i34e"]),
+        ("i3ei45e", ["i3e", "i45e"]),
+        ("4:spam", ["4:spam"]),
+        ("i34e4:spam", ["i34e", "4:spam"]),
+        ("4:spami1e3:cat", ["4:spam", "i1e", "3:cat"])
+    ])
+    def test_get_items(self, input, expected):
+        assert get_item(input) == expected
 
 
 class TestDecodeBencodeLists:

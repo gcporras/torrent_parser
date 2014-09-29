@@ -97,6 +97,32 @@ def decode_string(bstring):
         return bstring[colon:colon+length]
 
 
+def get_item(bdata):
+    # Base case, for an empty item data.
+    if bdata == "":
+        return []
+
+    # item is binteger
+    if get_bencode_type(bdata) == int:
+        # Take the integer, and get remaining items.
+        end = bdata.find("e")
+
+        item = bdata[:end + 1]
+        remaining_items = get_item(bdata[end + 1:])
+
+    # item is bstring
+    elif get_bencode_type(bdata) == str:
+        colon = bdata.index(":")
+        num = bdata[:colon]
+        length = int(num) + 1 + len(num) if num.isdigit() else 0  # This should be validated
+
+        item = bdata[:length]
+        remaining_items = get_item(bdata[length:])
+
+    # Returns the first item, with the inflated rest of the list.
+    return [item] + remaining_items
+
+
 def decode_list(blist):
     """
     Decodes the bencoded list representation and returns the decoded list.
