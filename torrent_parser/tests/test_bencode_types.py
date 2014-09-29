@@ -71,7 +71,7 @@ class TestBencodedStringValidation:
         assert errors.ERROR_BENCODE_STRING_INVALID_LENGTH in str(excinfo.value)
 
 
-class TestDecodeBencodeData:
+class TestDecodeBencodeBasicDataTypes:
     @pytest.mark.parametrize("input,expected", [
         ("i34e", 34),
         ("i345567745e", 345567745),
