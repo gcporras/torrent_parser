@@ -97,7 +97,38 @@ def decode_string(bstring):
         return bstring[colon:colon+length]
 
 
+def find_data_structure_end(bdata, index=1):
+    """
+    Returns the end of the outermost dict or list.
+    """
+    # item is binteger
+    if bdata[index] == "i":
+        # find the end and continue with next item
+        end = bdata.find("e", index)
+        return find_data_structure_end(bdata, end + 1)
+
+    # item is bstring
+    elif bdata[index].isdigit():
+        colon = bdata.find(":", index)
+        num = bdata[index:colon]
+        end = int(num) + 1 + len(num)
+        return find_data_structure_end(bdata, index + end)
+
+    # item is blist or bdict
+    elif bdata[index] in ["l", "d"]:
+        end = find_data_structure_end(bdata[index:], 1)
+        return find_data_structure_end(bdata, index + end)
+
+    # then we are at the end of the data structure
+    elif bdata[index] == "e":
+        index += 1
+        return index
+
+
 def get_item(bdata):
+    """
+    Returns a list of the items (binteger, bstring, blist, bdict) inside the bencoded data passed as argument.
+    """
     # Base case, for an empty item data.
     if bdata == "":
         return []
@@ -112,12 +143,19 @@ def get_item(bdata):
 
     # item is bstring
     elif get_bencode_type(bdata) == str:
-        colon = bdata.index(":")
+        colon = bdata.find(":")
         num = bdata[:colon]
         length = int(num) + 1 + len(num) if num.isdigit() else 0  # This should be validated
 
         item = bdata[:length]
         remaining_items = get_item(bdata[length:])
+
+    # otherwhise item is blist or bdict
+    elif get_bencode_type(bdata) in [list, dict]:
+        end = find_data_structure_end(bdata)
+
+        item = bdata[:end]
+        remaining_items = get_item(bdata[end:])
 
     # Returns the first item, with the inflated rest of the list.
     return [item] + remaining_items
@@ -129,3 +167,21 @@ def decode_list(blist):
     """
     if blist == "le":
         return []
+
+    # Pass list content and get items (take off 'l' and 'e')
+    bitems = get_item(blist[1:-1])
+    # Decode each item in the list.
+    return [decode(bitem) for bitem in bitems]
+
+
+decode_function = {}
+decode_function[int] = decode_integer
+decode_function[str] = decode_string
+decode_function[list] = decode_list
+
+
+def decode(bitem):
+    """
+    Decodes an bencode item regarding og its data type
+    """
+    return decode_function[get_bencode_type(bitem)](bitem)

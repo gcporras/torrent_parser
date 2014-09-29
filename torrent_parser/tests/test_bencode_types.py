@@ -9,6 +9,7 @@ from torrent_parser.bencode_types import (
     decode_integer,
     decode_string,
     decode_list,
+    find_data_structure_end,
     get_bencode_type,
     get_item
 )
@@ -90,13 +91,28 @@ class TestDecodeBencodeBasicDataTypes:
         assert decode_string(input) == expected
 
 
+class TestFindDataStructureEnd:
+    def test_find_data_end_for_list_with_integer(self):
+        bdata = "l4:spame3:end"
+        end = find_data_structure_end(bdata, 1)
+        assert bdata[:end] == "l4:spame"
+
+    def test_find_data_end_for_nested_dict(self):
+        bdata = "d5:gcp007:value_ed5:key_1e7:value_2ei1e"
+        end = find_data_structure_end(bdata, 1)
+        assert bdata[:end] == "d5:gcp007:value_ed5:key_1e7:value_2e"
+
 class TestGetItems:
     @pytest.mark.parametrize("input,expected", [
         ("i34e", ["i34e"]),
         ("i3ei45e", ["i3e", "i45e"]),
         ("4:spam", ["4:spam"]),
         ("i34e4:spam", ["i34e", "4:spam"]),
-        ("4:spami1e3:cat", ["4:spam", "i1e", "3:cat"])
+        ("4:spami1e3:cat", ["4:spam", "i1e", "3:cat"]),
+        ("li1ee", ["li1ee"]),
+        ("di12ee", ["di12ee"]),
+        ("d3:subd4:yoyo2:reeei88e", ['d3:subd4:yoyo2:reee', 'i88e']),
+        ("li45el3:catei3eeli1ee", ['li45el3:catei3ee', 'li1ee'])
     ])
     def test_get_items(self, input, expected):
         assert get_item(input) == expected
@@ -105,6 +121,8 @@ class TestGetItems:
 class TestDecodeBencodeLists:
     @pytest.mark.parametrize("input,expected", [
         ("le", []),
+        ("lli1ei2eeli3ei4eee", [[1, 2], [3, 4]]),
+        ("l3:cat2:doli2e1:Tee", ['cat', 'do', [2, 'T']])
     ])
     def test_bencode_decode_list(self, input, expected):
         assert decode_list(input) == expected
