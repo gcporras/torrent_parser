@@ -6,6 +6,7 @@ from torrent_parser.bencode_types import (
     BencodeTypeError,
     bencode_integer_is_valid,
     bencode_string_is_valid,
+    decode_dict,
     decode_integer,
     decode_string,
     decode_list,
@@ -102,6 +103,7 @@ class TestFindDataStructureEnd:
         end = find_data_structure_end(bdata, 1)
         assert bdata[:end] == "d5:gcp007:value_ed5:key_1e7:value_2e"
 
+
 class TestGetItems:
     @pytest.mark.parametrize("input,expected", [
         ("i34e", ["i34e"]),
@@ -126,3 +128,14 @@ class TestDecodeBencodeLists:
     ])
     def test_bencode_decode_list(self, input, expected):
         assert decode_list(input) == expected
+
+
+class TestDecodeBencodeDicts:
+    @pytest.mark.parametrize("input,expected", [
+        ("de", []),
+        ("d3:key5:valuee", {"key": "value"}),
+        ("d3:keyd3:key5:valueee", {'key': {'key': 'value'}}),
+        ("d3:keyl6:value16:value2ee", {'key': ["value1", "value2"]})
+    ])
+    def test_bencode_decode_dict(self, input, expected):
+        assert decode_dict(input) == expected

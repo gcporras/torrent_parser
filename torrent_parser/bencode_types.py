@@ -174,10 +174,31 @@ def decode_list(blist):
     return [decode(bitem) for bitem in bitems]
 
 
+def decode_dict(bdict):
+    """
+    Decodes the bencoded dict representation and returns the decoded dict.
+    """
+    if bdict == "de":
+        return []
+
+    # Pass dict content and get items (take off 'd' and 'e')
+    bitems = bdict[1:-1]
+
+    dict = {}
+    items = get_item(bitems)
+
+    count = 0
+    while count != len(items):
+        dict[decode_string(items[count])] = decode(items[count + 1])
+        count += 2
+
+    return dict
+
 decode_function = {}
 decode_function[int] = decode_integer
 decode_function[str] = decode_string
 decode_function[list] = decode_list
+decode_function[dict] = decode_dict
 
 
 def decode(bitem):
