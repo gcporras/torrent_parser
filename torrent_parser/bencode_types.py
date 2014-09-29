@@ -188,6 +188,7 @@ def decode_dict(bdict):
     items = get_item(bitems)
 
     count = 0
+    # Set dictionary's key, value data
     while count != len(items):
         dict[decode_string(items[count])] = decode(items[count + 1])
         count += 2
@@ -203,6 +204,6 @@ decode_function[dict] = decode_dict
 
 def decode(bitem):
     """
-    Decodes an bencode item regarding og its data type
+    Decodes an bencode item regarding of its data type
     """
     return decode_function[get_bencode_type(bitem)](bitem)
