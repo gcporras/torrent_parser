@@ -72,7 +72,7 @@ def bencode_string_is_valid(bstring):
         raise BencodeTypeError(errors.ERROR_BENCODE_STRING_MISSING_COLON, bstring)
 
     # String length must be a positive integer
-    if not bstring[0:colon].isdigit():
+    if not bstring[:colon].isdigit():
         raise BencodeTypeError(errors.ERROR_BENCODE_STRING_INVALID_LENGTH, bstring)
 
     return True
@@ -92,7 +92,7 @@ def decode_string(bstring):
     """
     if bencode_string_is_valid(bstring):
         colon = bstring.index(":")
-        length = int(bstring[0:colon])
+        length = int(bstring[:colon])
         colon += 1
         return bstring[colon:colon+length]
 
